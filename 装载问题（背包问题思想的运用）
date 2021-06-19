@@ -1,0 +1,113 @@
+
+/* 装载问题（背包问题思想的运用）*/
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+#define  max(x,y)   (x)>(y)?(x):(y)
+
+int w[100];//集装箱的重量
+int f[100][100]={0};//载重量为c1的轮船装载的最大重量 
+
+int zhuangzai(int c1,int c2,int n,int w[]){
+	int sum=0,sum1=0,sum2=0;
+	
+	//初始化，f[i][0]表示载重量c1=0时轮船的最大重量，f[0][j]表示载重量为c1的轮船不装任何集装箱时的最大重量 
+    for(int i=0;i<=n;i++){
+    	f[i][0]=0;
+	}
+    for(int j=0;j<=c1;j++){
+    	f[0][j]=0;
+	}
+    
+	printf("集装箱的编号 集装箱的重量\n");	    
+    for(int i=1;i<=n;i++){
+		printf("%7d      %7d",i,w[i]);
+        for(int j=1;j<=c1;j++){
+            if(j<w[i]){//集装箱的重量比载重量为c1的轮船剩余的载重量大，说明无法继续装下下一个集装箱，此时的f与前i-1个的f是一样的  
+				f[i][j]=f[i-1][j];
+			}
+            else{//集装箱的重量不超过载重量为c1的轮船剩余的载重量，说明此时可以装下下一个集装箱，但是装了也不一定能达到最优解，所以在装与不装之间选择最优的一个 
+                f[i][j]=max(f[i-1][j],f[i-1][j-w[i]]+w[i]);		
+			}
+		}
+		printf("\n");
+	}
+	
+	for(int i=1;i<=n;i++){
+		sum+=w[i];
+	}
+	
+	sum1=f[n][c1];
+	sum2=sum-sum1;
+	if(sum2<=c2){
+		return 1;
+	}
+	else{
+		return 0;
+	}
+}
+
+void Judge(int c1,int n,int w[]){		
+    int j=c1;
+    int x[100]={0};
+    int ww=0,w1=0,w2=0;
+	for(int i=1;i<=n;i++){
+		ww+=w[i];
+	}
+    for(int i=n;i>=1;i--){
+	    if(f[i][j]>f[i-1][j]){//如果集装箱装入了载重量为c1的轮船就标记，然后减去相应的该集装箱的重量 
+				x[i]=1;
+				j=j-w[i];
+				w1+=w[i];
+	    }
+	    else
+	        x[i]=0;
+    }
+    w2=ww-w1;
+    printf("载重量为c1的轮船装载的最大重量为:%d\n",w1);
+    printf("载重量为c1的轮船装载的集装箱编号:");
+    for(int i=1;i<=n;i++)
+        if(x[i]==1)
+        	printf("%d ",i);
+    printf("\n\n");
+    
+    printf("载重量为c2的轮船装载的最大重量为:%d\n",w2);
+    printf("载重量为c1的轮船装载的集装箱编号:");
+    for(int i=1;i<=n;i++)
+        if(x[i]==0)
+        	printf("%d ",i);
+    printf("\n");
+}
+
+
+int main(){
+    int c1,c2,n;
+    printf("输入轮船的载重量c1:");
+    scanf("%d",&c1);
+    printf("\n");
+    printf("输入轮船的载重量c2:");
+    scanf("%d",&c2);
+    printf("\n");
+    printf("输入集装箱的总数:");
+    scanf("%d",&n);
+    printf("\n");
+    printf("分别输入集装箱的重量:");
+    for(int i=1;i<=n;i++){
+    	scanf("%d",&w[i]);
+	}
+	printf("\n");
+	
+	int output[100],cnt=0;
+	output[++cnt]=zhuangzai(c1,c2,n,w);
+	printf("\n");
+	for(int i=1;i<=cnt;i++){
+		if(output[i]==1){
+			printf("Yes\n\n");
+			Judge(c1,n,w);
+		}
+		else{
+			printf("No\n");
+		}
+	}
+	return 0;
+}
