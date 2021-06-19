@@ -1,0 +1,77 @@
+
+/*二分归并排序*/
+#include<stdio.h>
+#include<stdlib.h>
+
+void Merge(int A[],int p,int q,int r){
+	int i,j,k,n1,n2;
+	
+	n1=q-p+1;//数组A[]前一部分的长度 
+	n2=r-q;//数组A[]后一部分的长度 
+
+    int A1[n1],A2[n2];
+	//定义新的数组A1[],A2[]分别存放数组A[]的前半部分和后半部分的数组元素 
+	
+	/*将数组元素转移*/ 
+	for(i=1;i<=n1;i++){
+		A1[i]=A[p+i-1];
+	}
+	for(i=1;i<=n2;i++){
+		A2[i]=A[q+i];
+	}
+	
+	/*合并元素(排序)*/
+	i=1;
+	j=1;
+	k=p;
+	while(i<=n1&&j<=n2){//谁小就把谁copy到数组中 
+		if(A1[i]<A2[j]){
+            A[k++]=A1[i++];
+		}
+		else{
+			A[k++]=A2[j++];
+		}
+	}
+	
+	/*将剩余元素合并*/ 
+	while(i<=n1){
+            A[k++]=A1[i++];
+	}
+	while(j<=n2){
+			A[k++]=A2[j++];
+	}
+}
+
+void Merge_Sort(int A[],int p,int r){
+	int q;
+	if(p<r){
+		q=(p+r)/2;//分解数组 
+		Merge_Sort(A,p,q);//前半部分递归排序 
+		Merge_Sort(A,q+1,r);//后半部分递归排序 
+		Merge(A,p,q,r);//合并元素 
+	}
+}
+
+void print_array(int A[],int n){
+	for(int i=1;i<=n;i++){
+		printf("%d ",A[i]);
+	}
+	printf("\n");
+}
+
+int main(){
+	int n;
+	printf("数组长度为:");
+	scanf("%d",&n);
+	
+	int A[n];
+	printf("数组元素为:");
+	for(int i=1;i<=n;i++){
+		scanf("%d",&A[i]);
+	} 
+
+    printf("排序后的数组:");
+	Merge_Sort(A,1,n);
+	print_array(A,n);
+	return 0;
+} 
