@@ -1,0 +1,92 @@
+
+/*LCS算法（最长公共子序列问题）*/ 
+#include<iostream>
+using namespace std;
+
+int lcs[100][100];//记录lcs
+char X[100],Y[100];//两个序列 
+char Z[100][100];//矩阵跟踪，用于最后输出lcs
+
+void LCS(int m,int n){
+	int i,j;
+	
+	//初始化矩阵
+	for(i=0;i<=m;i++){
+		lcs[i][0]=0;
+	} 
+	for(j=0;j<=n;j++){
+		lcs[0][j]=0;
+	}
+	
+	//Z[i][j]=2表示删除2个，=0表示删除x，=1表示删除y 
+	for(i=1;i<=m;i++){
+		for(j=1;j<=n;j++){
+			if(X[i]==Y[j]){
+				lcs[i][j]=lcs[i-1][j-1]+1;
+				Z[i][j]=2;//来自左上方向 
+			}
+			
+			if(X[i]!=Y[j]){
+				if(lcs[i-1][j]>=lcs[i][j-1]){
+					lcs[i][j]=lcs[i-1][j];
+					Z[i][j]=0;//来自上方向 
+				}
+				
+				else{
+					lcs[i][j]=lcs[i][j-1];
+					Z[i][j]=1;//来自左方向 
+				}
+			} 
+			
+		}
+	}
+} 
+
+void PrintLCS(int m,int n){
+	int i,j;
+	char stack[100];//存储LCS串的栈 
+	int top=0;//栈顶 
+	i=m;
+	j=n;
+	cout<<"最长公共子序列的长度为:"<<lcs[i][j]<<endl;
+	cout<<"最长公共子序列LCS为:"; 
+	while(i!=0&&j!=0){
+		if(Z[i][j]==2){
+			stack[++top]=Y[j];
+			i--;
+			j--;
+		}
+		else if(Z[i][j]==1){
+			j--;
+		}
+		else{
+			i--;
+		}
+	}
+	
+	while(top!=0){
+		cout<<stack[top--];//根据矩阵跟踪到的LCS串是倒序的，故需要反过来输出 
+	}
+} 
+
+int main(){
+	int m,n,i,j;
+	cout<<"序列X的长度：";
+	cin>>m;
+	cout<<"序列Y的长度：";
+	cin>>n;
+	cout<<endl; 
+	cout<<"序列X："; 
+	for(i=1;i<=m;i++){
+		cin>>X[i];
+	}
+	cout<<"序列Y：";
+	for(j=1;j<=n;j++){
+		cin>>Y[j];
+	}
+	
+	cout<<endl;
+	LCS(m,n);
+	PrintLCS(m,n);
+	return 0;
+}
