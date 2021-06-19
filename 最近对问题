@@ -1,0 +1,112 @@
+
+/*最近对问题*/
+#include<iostream>
+#include<math.h>  //计算距离
+#include<algorithm>  //排序
+#define MAX 1000000  //定义无穷大
+#define M 100
+using namespace std;
+
+struct point{
+  double x;
+  double y;
+}p[M];
+ 
+int Q[M];  //保存排序的索引
+ 
+int sortX(const point& a,const point& b)  //按x升序
+{  
+	return a.x<b.x;
+}
+ 
+int sortY(int &a,int &b)   //按y升序
+{
+	return p[a].y<p[b].y;
+}
+ 
+double min(double a,double b)   //返回两个值中较小值 
+{
+	return a<b?a:b;
+}
+
+double Distance(const point& a,const point& b)  //返回任意两点之间的距离 
+{
+  return sqrt((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y));
+}
+
+double EfficientClosestPair(int left,int right)
+{
+	if(left==right)   //n=1,只有一个点，不合法 
+	{
+		return MAX;
+	}
+	if(left+1==right)  //即n=2，则直接返回两点之间的距离
+	{
+		return Distance(p[left],p[right]);
+	}
+	if(left+2==right)  //n=3
+	{
+		double d1=Distance(p[left],p[left+1]);
+		double d2=Distance(p[left+1],p[right]);
+		double d3=Distance(p[left],p[right]);
+		double d4=min(d1,d2);
+		double d5=min(d1,d3);
+		return min(d4,d5);
+	}
+	
+	else  //n>=3
+	{
+		int mid=(left+right)/2;
+		double dist1=EfficientClosestPair(left,mid);  //递归求出左半部分S1中的任意两点之间的最小距离 
+		double dist2=EfficientClosestPair(mid+1,right);  //递归求出右半部分S2中的任意两点之间的最小距离
+		double dist=min(dist1,dist2);  //求出两边的最小距离
+		
+		int i,j,c=0;
+		for(i=left;i<=right;i++) //统计位于两虚线内的点，并记录
+		{
+			if (p[mid].x-p[i].x<=dist&&p[i].x<=p[mid].x+dist)
+			{
+				Q[c++]=i;
+			}
+		}
+		sort(Q,Q+c,sortY);  //记录得到的点再按y值排序
+		 
+		for(i=0;i<c;i++)//比较s1中虚线内的点和s2中虚线内的点的距离是否存在有小于两侧最小距离dist 
+		{
+			int k=i+7>c?c:i+7;  
+			for(j=i+1;j<k;j++)
+			{
+				if(p[Q[j]].y-p[Q[i]].y>dist)  //如果位于中位线两侧的点的距离大于dist则退出循环 
+				{
+					break;
+				}
+				dist=min(Distance(p[Q[i]],p[Q[j]]),dist);   //如果存在两个点之间的距离小于两侧的最近对dist，则选出最小的点
+			}
+		}
+		return dist;
+	}
+	
+}
+ 
+int main()
+{
+	int n;  //输入的点的个数 
+	double dmin;
+	cout<<"输入的点的个数：";
+	cin>>n;
+	cout<<endl;
+	cout<<n<<"个点的坐标分别为："<<endl<<endl;
+	for(int i=0;i<n;i++)  
+	{
+		cout<<"x"<<i+1<<":";
+		cin>>p[i].x;
+		cout<<"y"<<i+1<<":";
+		cin>>p[i].y;
+		cout<<endl;
+	}
+	sort(p,p+n,sortX); //按照x值排序
+	dmin=EfficientClosestPair(0,n-1);
+	cout<<endl;
+	cout<<"最近对的距离："<<dmin<<endl;
+	return 0;
+}
