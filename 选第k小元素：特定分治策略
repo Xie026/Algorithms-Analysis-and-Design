@@ -1,0 +1,121 @@
+
+/*选第k小元素：特定分治策略*/ 
+#include<stdio.h>
+#include<stdlib.h>
+
+void Merge(int A[],int p,int q,int r){
+	int i,j,k,n1,n2;
+	
+	n1=q-p+1;//数组A[]前一部分的长度 
+	n2=r-q;//数组A[]后一部分的长度 
+
+    int A1[n1],A2[n2];
+	//定义新的数组A1[],A2[]分别存放数组A[]的前半部分和后半部分的数组元素 
+	
+	/*将数组元素转移*/ 
+	for(i=1;i<=n1;i++){
+		A1[i]=A[p+i-1];
+	}
+	for(i=1;i<=n2;i++){
+		A2[i]=A[q+i];
+	}
+	
+	/*合并元素(排序)*/
+	i=1;
+	j=1;
+	k=p;
+	while(i<=n1&&j<=n2){//谁小就把谁copy到数组中 
+		if(A1[i]<A2[j]){
+            A[k++]=A1[i++];
+		}
+		else{
+			A[k++]=A2[j++];
+		}
+	}
+	
+	/*将剩余元素合并*/ 
+	while(i<=n1){
+            A[k++]=A1[i++];
+	}
+	while(j<=n2){
+			A[k++]=A2[j++];
+	}
+}
+
+void Merge_Sort(int A[],int p,int r){//二分归并排序 
+	int q;
+	if(p<r){
+		q=(p+r)/2;//分解数组 
+		Merge_Sort(A,p,q);//前半部分递归排序 
+		Merge_Sort(A,q+1,r);//后半部分递归排序 
+		Merge(A,p,q,r);//合并元素 
+	}
+}
+
+int select(int A[],int left,int right,int k){
+	int n=right-left;//计算数组规模大小
+	if(n<5){//数组规模小于5时直接调用二分归并排序输出结果 
+		Merge_Sort(A,left,right-1);
+		return A[left+k-1];
+	} 
+	
+	//n>5
+	int i;
+	int t=n/5;//每5个元素分为一组，一共分为t组
+	int *p=new int[t];//定义一个指针变量p，开辟一块空间，大小为t个int类型，令p指向这块空间开头 
+	for(i=0;i<t;i++){//对每个5元组排序，排序后选出中位数数组 
+		Merge_Sort(A,left+i*5,left+i*5+4); 
+		p[i]=A[left+i*5+2];
+	} 
+	
+	Merge_Sort(p,0,i-1);//对选出的中位数数组再单独排序（不改变上一步的顺序）
+	int mid=p[i/2];//求出中位数数组的中位数mid
+	int *a1=new int[n];
+	int *a2=new int[n];
+	int *a3=new int[n];
+	int s1=0;
+	int s2=0;
+	int s3=0;
+	for(int i=left;i<right;i++){
+		if(A[i]<mid){//元素小于mid的存入a1数组 
+			a1[s1++]=A[i]; 
+		}
+		else if(A[i]==mid){//元素等于mid的存入a2数组 
+			a2[s2++]=A[i];
+		}
+		else{//元素大于mid的存入a3数组
+			a3[s3++]=A[i];
+		}
+	}
+	
+	if(k<=s1){//小于mid的元素的个数大于或等于k 
+		return select(a1,0,s1,k); 
+	} 
+	if(k<=s1+s2){//小于mid的元素的个数加上等于mid元素的个数大于或等于k 
+		return mid;
+	}
+	else{//小于mid的元素的个数加上等于mid元素的个数小于k 
+		return select(a3,0,s3,k-s1-s2);
+	} 
+	
+}
+
+
+int main(){
+	int n;
+	printf("数组大小:");
+	scanf("%d",&n);
+	printf("\n");
+	int A[n];
+	printf("数组元素:");
+	for(int i=0;i<n;i++){
+		scanf("%d",&A[i]);
+	}
+	printf("\n");
+	int k;
+	printf("k=");
+	scanf("%d",&k);
+	printf("\n"); 
+	printf("第%d小元素为:%d",k,select(A,0,n,k));
+	return 0;
+}
