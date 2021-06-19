@@ -1,0 +1,68 @@
+
+/*Dijkstra算法求最短路径*/
+#include<stdio.h>
+#define N 20//最大顶点数为20
+#define INF 1000000000//表示无穷大
+
+int graph[N][N];//邻接矩阵存储图
+int Dijikstra(int from,int to,int Nv){
+	int dist[N];//dist[i]表示源点到顶点i的最短距离
+	int visit[N];//节点是否被访问
+	int i;
+	for(i=1;i<=Nv;i++){
+		visit[i]=0;//初始化visit数组，visit[i]=0表示一开始每个节点都没有被访问
+		dist[i]=graph[from][i];//初始化disit数组，表示源点到其余各个顶点的距离 
+	}
+	visit[from]=1;
+	dist[from]=0;
+	
+	int j;
+	for(i=1;i<=Nv-1;i++){//对除源点之外的每一个点进行最短距离计算 
+		int mindist=INF;//初始化最小的dist[i]
+		int  minv=0;//记录dist[i]最小的点
+		
+		//寻找距离当前源点距离最近的节点 
+		for(j=1;j<=Nv;j++){
+			if(!visit[j]&&mindist>dist[j]){
+				minv=j;
+				mindist=dist[j];
+			}
+		}
+		
+		visit[minv]=1;//将寻找到最小权值节点更新为已被遍历 
+		from=minv;//更新源点 
+		
+		//更新权值 
+		for(j=1;j<=Nv;j++){
+			if(!visit[j]&&(dist[j]>=(dist[from]+graph[from][j]))){
+			     //如果j节点没有被访问过&&j节点到源节点的最短路径 
+				dist[j]=dist[from]+graph[from][j];//更新J节点到源节点的最短路径>minv节点到源节点的距离+minv节点到j节点的距离 
+			}
+		}
+		 
+	} 
+	printf("%d\n",dist[to]);
+} 
+
+int main(){
+    int i,j,t,a,b,Nv,Ne,weight,from,to;
+	printf("输入顶点数和边数：");  
+    scanf("%d%d",&Nv,&Ne);//Nv表示顶点数，Ne表示边的个数
+    
+    for(i=1;i<=Nv;i++){//初始化图，设一开始每一个节点都不可达   
+        for(j=1;j<=Nv;j++){  
+            graph[i][j]=INF; 
+        }  
+    }
+    
+    for(t=1;t<=Ne;t++){  
+        scanf("%d%d%d",&a,&b,&weight);
+        graph[a][b]=weight;  
+    } 
+    
+    printf("输入起始点,终止点,顶点数："); 
+    scanf("%d%d",&from,&to);
+    printf("顶点%d和顶点%d之间的最短路径为：",from,to);
+	Dijikstra(from,to,Nv);
+	return 0;
+}
