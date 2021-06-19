@@ -1,0 +1,102 @@
+
+/*Kruskal算法求最小生成树*/
+#include <stdio.h>
+#define MAXE 100
+#define MAXV 100
+
+typedef struct{
+	int v1;//边的起始顶点
+	int v2;//边的终止顶点
+	int weight;//边的权值
+}Edge;
+
+void kruskal(Edge E[],int n,int e){ 
+    int i,k,j,sum=0;
+	int a[n+1];
+	//数组a[i]用来判断某边是否加入了最小生成树集合，n个顶点有(n+1)条边
+	for(i=1;i<=n;i++){//初始化数组a[i]
+		a[i]=i;
+	}
+
+	k=1;//表示当前形成的最小生成树的第K条边，初始值为1
+  	j=0;//E中边的下标，初始值为0
+	
+	int vv1,vv2,a1,a2;   
+    while(k<e){//所形成的生成树的边数小于原来图中的边数 
+        vv1=E[j].v1;
+        vv2=E[j].v2;//取一条边的两个邻接点
+       
+        a1=a[vv1];
+        a2=a[vv2];//分别得到两个顶点所属的集合编号
+       
+	    if(a1!=a2){
+	    	//两顶点分属不同的集合，不能出现回路，该边是最小生成树的一条边
+			printf("V%d-V%d=%d\n",vv1,vv2,E[j].weight);
+			sum+=E[j].weight;//权值之和 
+			k++;//最小生成树的边数增加
+			if(k>=n){
+				break;
+			}
+
+			for(i=1;i<=n;i++){
+				//两个集合统一编号
+				if (a[i]==a2){
+					a[i]=a1;//集合编号为a2的改为a1 
+				}
+		    }
+	    }
+     j++;//继续遍历下一条边 
+   }
+    printf("最小权值之和=%d\n",sum);
+}
+
+int f(Edge array[],int low,int high){
+ 	int k;
+ 	Edge lowx;
+ 	lowx=array[low];
+ 	k=array[low].weight;
+ 	while(low<high){
+ 		while(low<high&&array[high].weight>=k){
+			//从右向左寻找第一个小于k的权值 
+ 			high--;
+		}
+ 		if(low<high){
+ 			array[low]=array[high];	
+			low++;		
+		}
+
+ 		while(low<high&&array[low].weight<k){
+			//从左向右寻找第一个大于k的权值 
+ 			low++;	
+		}
+ 		if(low<high){
+ 			array[high]=array[low];
+ 			high--;
+		 }
+	}
+	array[low]=lowx;
+	return low;
+} 
+
+void Quick_Sort(Edge array[],int left,int right){
+	int key;
+	if(left<right){
+	    key=f(array,left,right);
+	    Quick_Sort(array,left,key-1);
+	    Quick_Sort(array,key+1,right);
+	}
+}
+
+int main(){
+	Edge E[MAXE];
+	int Nv,Ne;
+	printf("输入顶点数和边数:");
+	scanf("%d%d",&Nv,&Ne);
+	for(int i=0;i<Ne;i++){
+		scanf("%d%d%d",&E[i].v1,&E[i].v2,&E[i].weight);
+	}
+	
+	Quick_Sort(E,0,Ne-1);
+	kruskal(E,Nv,Ne);
+}
+
