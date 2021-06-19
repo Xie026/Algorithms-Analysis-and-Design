@@ -1,0 +1,36 @@
+
+/*二分查找*/
+#include<stdio.h>
+int BinSearch(int array[],int n,int key){
+	int left=1,right=n,mid;
+	while(left<=right){//当前区间存在元素时循环 
+		mid=(left+right)/2;
+		if(array[mid]>key){
+			right=mid-1;//在左半边继续查找 
+		}
+		else if(array[mid]<key){
+			left=mid+1;//在右半边继续查找 
+		}
+		else{
+			printf("查找成功，指定值%d的下标为:",key);
+			return mid;
+		}
+	}
+	printf("查找失败，该元素不存在于数组中\n");
+	return 0;
+}
+int main(void){
+	int n;
+	printf("输入数组大小：");
+	scanf("%d",&n);
+	int array[n];
+	printf("输入数组元素：");
+	for(int i=1;i<=n;i++){//升序数组 
+		scanf("%d",&array[i]);
+	}
+	int key;
+	printf("输入要查找的元素：");
+	scanf("%d",&key);
+	printf("%d",BinSearch(array,n,key));
+	return 0;
+}
