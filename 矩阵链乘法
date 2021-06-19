@@ -1,0 +1,108 @@
+
+/*矩阵链乘法迭代*/
+#include<stdio.h>
+void MatrixChain(int p[1000],int n);
+int m[1000][1000];//m[i][j]表示得到乘积Ai...j所用的最少基本运算（乘法）次数
+int s[1000][1000];//最后一次运算的位置 
+
+
+int main(){
+	int n;
+	printf("迭代算法\n\n"); 
+	printf("矩阵个数为："); 
+	scanf("%d",&n);
+	printf("\n");
+	int p[1000];
+	printf("矩阵链A1...%d：",n);
+	for(int i=0;i<=n;i++){
+		scanf("%d",&p[i]); 
+	}
+	
+	printf("\n");
+	int a,b;
+	scanf("%d%d",&a,&b);  
+	MatrixChain(p,n);
+	printf("计算矩阵链A%d...%d:\n",a,b);
+	printf("最小乘法运算次数m[%d,%d]=%d\n",a,b,m[a][b]);
+	printf("最后一次运算的位置s[%d,%d]=%d\n",a,b,s[a][b]); 
+	return 0;
+}
+
+
+//迭代算法 
+void MatrixChain(int p[1000],int n){
+	int i,j,t,r,k;
+	for(i=1;i<=n;i++){
+		m[i][i]=0;
+	}
+	for(r=2;r<=n;r++){//r为当前问题规模的长度 
+		for(i=1;i<=n-r+1;i++){//i的起点不断变化，各种r长 
+			j=i+r-1;//不同终点 
+			m[i][j]=m[i+1][j]+p[i-1]*p[i]*p[j];//划分为Ai(Ai+1...Aj)
+			s[i][j]=i;//记录当前最后一次运算的位置i 
+			for(k=i+1;k<=j-1;k++){
+				t=m[i][k]+m[k+1][j]+p[i-1]*p[k]*p[j];//划分为(Ai...k)(Ak+1...j)
+				if(t<m[i][j]){
+					s[i][j]=k;
+					m[i][j]=t;
+				}
+			}
+		}
+	}
+} 
+
+
+
+
+
+
+/*矩阵链乘法递归*/
+#include<stdio.h>
+int RecurMatrixChain(int p[1000],int i,int j);
+int m[1000][1000];//m[i][j]表示得到乘积Ai...j所用的最少基本运算（乘法）次数
+int s[1000][1000];//最后一次运算的位置 
+
+
+int main(){
+	int n;
+	printf("递归算法\n\n");
+	printf("矩阵个数为："); 
+	scanf("%d",&n);
+	printf("\n");
+	int p[1000];
+	printf("矩阵链A1...%d：",n);
+	for(int i=0;i<=n;i++){
+		scanf("%d",&p[i]); 
+	}
+	
+	printf("\n");
+	int a,b;
+	scanf("%d%d",&a,&b);
+	RecurMatrixChain(p,a,b);
+	printf("计算矩阵链A%d...%d:\n",a,b);
+	printf("最小乘法运算次数m[%d,%d]=%d\n",a,b,m[a][b]);
+	return 0;
+}
+
+
+//递归算法 
+int RecurMatrixChain(int p[1000],int i,int j){
+	if(i==j){
+		m[i][j]=0;
+		s[i][j]=i;
+		return m[i][j];
+	}
+	
+	m[i][j]=1000000;
+	s[i][j]=i;
+	int q=0;
+	
+	for(int k=i;k<=j-1;k++){
+		q=RecurMatrixChain(p,i,k)+RecurMatrixChain(p,k+1,j)+p[i-1]*p[k]*p[j];
+		if(q<m[i][j]){
+			m[i][j]=q;
+			s[i][j]=k;
+		}
+	}
+	return m[i][j];
+} 
