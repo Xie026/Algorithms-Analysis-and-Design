@@ -1,0 +1,115 @@
+
+/*最优前缀编码*/
+#include<stdio.h>
+
+struct Huffman{
+    int weight;//权值 
+    char ch;//字符 
+    int parent;//父亲节点 
+    int leftchild;//左孩子 
+    int rightchild;//右孩子 
+};
+
+struct Hcode{
+    int code[100];//字符的哈夫曼编码的存储
+    int start;//开始位置
+};
+
+Huffman huffman[100];//最大字符编码数组长度 
+Hcode code[100];//最大哈夫曼编码结构体数组的个数 
+
+void BuildHuffmanTree(int n){
+    for(int i=0;i<n*2-1;i++){//哈夫曼节点的初始化 
+        huffman[i].weight=0;
+        huffman[i].parent=-1;
+        huffman[i].leftchild=-1;
+        huffman[i].rightchild=-1;
+    }
+    for(int i=0;i<n;i++){
+        printf("输入第%d个哈夫曼编码的字符和权重:\n",i+1);
+        scanf("%s%d",&huffman[i].ch,&huffman[i].weight);
+    }
+    
+    //每次找出权重最小的节点，生成新的节点，需要n-1次合并 
+	int a,b,w1,w2;
+    for(int i=0;i<n-1;i++){
+        a=b=-1;
+        w1=w2=10000;
+        for(int j=0;j<n+i;j++){//注意每次在n+i里面遍历
+			//得到权重最小的点 
+            if(huffman[j].parent==-1&&huffman[j].weight<w1){//如果每次最小的更新了，那么需要把上次最小的给第二个最小的 
+                w2=w1;
+                b=a;
+                a=j;
+                w1=huffman[j].weight;
+            }
+            
+            //注意这里用else if而不是if,是因为它们每次只选1个就可以了 
+            else if(huffman[j].parent==-1&&huffman[j].weight<w2){
+                b=j;
+                w2=huffman[j].weight;
+            }
+        }
+        
+        //每次找到最小的两个节点后要记得合并成一个新的节点 
+        huffman[n+i].leftchild=a;
+        huffman[n+i].rightchild=b;
+        huffman[n+i].weight=w1+w2;
+        huffman[a].parent=n+i;
+        huffman[b].parent=n+i;
+    }
+}
+
+void PrintHuffmanTree(int n){//打印每个字符的哈夫曼编码 
+    Hcode CurrentCode;//保存当前叶子节点的字符编码 
+    int CurrentParent;//当前父节点
+    int c;//下标和叶子节点的编号 
+    
+    for(int i=0;i<n;i++){
+        CurrentCode.start=n-1;
+        c=i;
+        CurrentParent=huffman[i].parent;
+        while(CurrentParent!=-1){//父节点不等于-1才可以遍历 
+        
+        	//判断当前父节点的左孩子是否为当前值，是则取0，否则取1 
+            if(huffman[CurrentParent].leftchild==c){
+                CurrentCode.code[CurrentCode.start]=0;
+            }
+            else{
+                CurrentCode.code[CurrentCode.start]=1;
+            }
+            CurrentCode.start--;
+            c=CurrentParent;//保存当前变量i 
+            CurrentParent=huffman[c].parent;
+        }
+        
+        for(int j=CurrentCode.start+1;j<n;j++){//把当前叶子节点信息保存到编码结构体里面 
+            code[i].code[j] = CurrentCode.code[j];
+        }
+        code[i].start=CurrentCode.start;
+    }
+}
+
+int main(){
+	int n=0;
+    printf("输入哈夫曼字符个数:");
+    scanf("%d",&n);
+    printf("\n");
+    if(n<=0){
+		printf("输入个数不合法");
+		return -1;
+    }
+    
+    BuildHuffmanTree(n);
+    PrintHuffmanTree(n);
+    
+    printf("\n");
+    for(int i=0;i<n;++i){
+        printf("字符%c的哈夫曼编码为:",huffman[i].ch);
+        for(int j=code[i].start+1;j<n;++j){
+            printf("%d",code[i].code[j]);
+        }
+        printf("\n");
+    }
+    return 0;
+}
