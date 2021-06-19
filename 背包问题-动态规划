@@ -1,0 +1,76 @@
+
+/*背包问题-动态规划*/ 
+#include<stdio.h>
+#include<stdlib.h>
+#define  max(x,y)   (x)>(y)?(x):(y) 
+int f[100][100];//前k个物品装入容量为j的背包中获得的最大价值
+int weight[100];//物品的重量 
+int value[100];//物品的价值 
+ 
+int MaxValue(int N,int W,int weight[],int value[]){
+    
+	//初始化，f[i][0]表示背包重量限制为0时的最大价值， f[0][j]表示背包不装物品的价值 
+    for(int i=0;i<=N;i++){
+    	f[i][0]=0;
+	}
+    for(int j=0;j<=W;j++){
+    	f[0][j]=0;
+	}
+    
+	printf("编号 重量 价值  \n");
+		    
+    for(int i=1;i<=N;i++){
+		printf("%2d   %2d   %2d",i,weight[i-1],value[i-1]);//weight与value都是从0开始存的，所以开始i=1时对应0的位置
+		
+        for(int j=1;j<=W;j++){
+            if(j<weight[i-1]){//物品的重量比背包剩余的能容纳的重量大，装不下，此时的价值与前i-1个的价值是一样的
+				f[i][j]=f[i-1][j];
+			}
+            else{//背包剩余的能容纳的重量大于等于该物品的重量，但装了也不一定达到当前最优价值，所以在装与不装之间选择最优的一个
+                f[i][j]=max(f[i-1][j],f[i-1][j-weight[i-1]]+value[i-1]);		
+			}
+		}
+		printf("\n");
+	}
+    return f[N][W]; 
+}
+
+void Judge(int W,int N,int weight[]){//判断哪些物品被选中		
+    int j=W;
+    int state[100];
+    for(int i=N;i>=1;i--){
+	    if(f[i][j]>f[i-1][j]){//如果装了就标记，然后减去相应重量 
+				state[i]=1;
+				j=j-weight[i-1];
+	        }
+	    else
+	        state[i]=0;
+    }
+    printf("选中的物品编号是:");
+    for(int i=1;i<=N;i++)
+        if(state[i]==1)
+        	printf("%d ",i);
+    printf("\n");
+}
+ 
+int main(){
+    int N;//物品的数量 
+    int W;//背包最大容量
+    printf("输入物品数:");
+    scanf("%d",&N);
+    printf("输入背包的最大容量:");
+    scanf("%d",&W);
+    printf("分别输入物品的重量:");
+    for(int i=0;i<N;i++){
+    	scanf("%d",&weight[i]);
+	}
+    printf("分别输入物品的价值:");
+    for(int i=0;i<N;i++){
+    	scanf("%d",&value[i]);
+	}
+    printf("背包的最大价值为:%d\n",MaxValue(N,W,weight,value));
+    Judge(W,N,weight);//判断哪些物品被选择 
+    return 0;
+}
+
+ 
