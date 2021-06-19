@@ -1,0 +1,65 @@
+
+/*for循环*/
+#include<stdio.h>
+int main(void){
+	int n;
+	printf("输入数组大小：");
+	scanf("%d",&n);
+	int array[n];
+	printf("输入数组元素："); 
+	for(int i=1;i<=n;i++){
+		scanf("%d",&array[i]);
+	} 
+	
+	int j,key;
+	printf("输入要查找的元素："); 
+	scanf("%d",&key);
+	for(j=1;j<=n;j++){
+		if(array[j]==key){
+			printf("查找成功，关键字%d的下标j为:%d\n",key,j);
+			break;
+		}
+	}
+	if(j>n){
+		printf("j=0,查找失败，该元素不存在于数组中\n");
+	}
+	return 0;
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+/*while循环*/
+#include<stdio.h>
+int SeqSearch(int array[],int n,int key){//key为待在array[]查找的关键字 
+	int i=1;
+	while(i<=n&&array[i]!=key){//从数组的第一个元素往后找 
+		i++;
+	}
+	if(i>n){
+        printf("查找失败，该元素不存在于数组中\n");
+        return 0;
+	}
+	else{
+		printf("查找成功，指定值%d的下标为:",key);
+		return i;//找到返回其下标 
+	}
+}
+int main(void){
+	int n;
+	printf("输入数组大小：");
+	scanf("%d",&n);
+	int array[n];
+	printf("输入数组元素：");
+	for(int i=1;i<=n;i++){
+		scanf("%d",&array[i]);
+	}
+	int key;
+	printf("输入要查找的元素：");
+	scanf("%d",&key);
+	printf("%d",SeqSearch(array,n,key));
+	return 0;
+}
